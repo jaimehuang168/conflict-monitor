@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2026 全球地緣衝突即時觀測面板 (Real-time Edition)</title>
+    <!-- 引入 Tailwind CSS -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style>
+        .filter-btn.active {
+            background-color: #ef4444;
+            color: white;
+            border-color: #ef4444;
+        }
+        /* 隱藏滾動條但保持功能 */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen font-sans flex flex-col">
+
+    <!-- 頂部導航欄 -->
+    <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-50 shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <span class="flex h-3 w-3 relative">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+                </span>
+                <h1 class="text-xl font-bold tracking-wider">全球地緣衝突即時觀測面板 <span class="text-sm font-normal text-slate-400">REAL-TIME MONITOR</span></h1>
+            </div>
+            <div class="flex items-center gap-4">
+                <div id="live-clock" class="text-sm font-mono bg-slate-950 px-3 py-1.5 rounded border border-slate-800 text-emerald-400">
+                    系統時間載入中...
+                </div>
+                <div class="text-xs text-slate-500 hidden sm:block">
+                    Data Status: Live Intercept
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主內容區：雙欄排版 -->
+    <div class="max-w-7xl mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1 w-full">
+        
+        <!-- 左側與中間：衝突區域控制與卡片群 (佔 2 欄) -->
+        <div class="lg:col-span-2 space-y-6">
+            <!-- 篩選控制 -->
+            <div class="flex flex-wrap gap-2 items-center bg-slate-900/40 p-3 rounded-xl border border-slate-900">
+                <span class="text-xs text-slate-400 font-mono uppercase tracking-wider mr-2">Spectrum:</span>
+                <button onclick="filterConflicts('all')" id="btn-all" class="filter-btn active text-xs font-semibold px-3 py-1.5 rounded-md border border-slate-700 hover:border-slate-500 transition cursor-pointer">
+                    全部 (ALL)
+                </button>
+                <button onclick="filterConflicts('active')" id="btn-active" class="filter-btn text-xs font-semibold px-3 py-1.5 rounded-md border border-slate-700 hover:border-red-500 text-red-400 transition cursor-pointer">
+                    全面戰爭 (Active War)
+                </button>
+                <button onclick="filterConflicts('quasi')" id="btn-quasi" class="filter-btn text-xs font-semibold px-3 py-1.5 rounded-md border border-slate-700 hover:border-amber-500 text-amber-400 transition cursor-pointer">
+                    準戰爭狀態 (Quasi-war)
+                </button>
+            </div>
+
+            <!-- 衝突圖卡網格 -->
+            <div id="conflict-grid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- 卡片 1: 中東 -->
+                <div class="conflict-card bg-slate-900 border border-slate-800 rounded-xl p-5 flex flex-col justify-between hover:border-red-900/50 transition-all duration-300 shadow-md" data-status="active">
+                    <div>
+                        <div class="flex justify-between items-start mb-3">
+                            <span class="bg-red-950 text-red-400 border border-red-800/30 text-[10px] font-bold px-2 py-0.5 rounded uppercase font-mono">Active War</span>
+                            <span class="text-[11px] text-slate-500 font-mono">MIDDLE EAST</span>
+                        </div>
+                        <h3 class="text-base font-bold text-white mb-1">美以伊戰爭與荷姆茲海峽危機</h3>
+                        <p class="text-[11px] font-mono text-slate-500 mb-3">Middle East Conflict</p>
+                        <p class="text-xs text-slate-300 leading-relaxed"><strong>現況：</strong>爭奪焦點全面鎖定荷姆茲海峽航道權。美方於7月13日實行反封鎖令，美海軍第五艦隊與伊朗革命衛隊（IRGC）快艇在周邊海域形成高強度對峙，戰火隨時可能外溢。</p>
+                    </div>
+                </div>
+
+                <!-- 卡片 2: 俄烏 -->
+                <div class="conflict-card bg-slate-900 border border-slate-800 rounded-xl p-5 flex flex-col justify-between hover:border-red-900/50 transition-all duration-300 shadow-md" data-status="active">
+                    <div>
+                        <div class="flex justify-between items-start mb-3">
+                            <span class="bg-red-950 text-red-400 border border-red-800/30 text-[10px] font-bold px-2 py-0.5 rounded uppercase font-mono">Active War</span>
+                            <span class="text-[11px] text-slate-500 font-mono">EUROPE</span>
+                        </div>
+                        <h3 class="text-base font-bold text-white mb-1">俄烏戰爭 (消耗對抗戰)</h3>
+                        <p class="text-[11px] font-mono text-slate-500 mb-3">Russia-Ukraine War</p>
+                        <p class="text-xs text-slate-300 leading-relaxed"><strong>現況：</strong>前線陷入無人機與火砲飽和消耗僵局。烏軍大量部署 FPV 自殺無人機精準打擊，而俄軍遠程飛彈持續重創烏克蘭電網，導致其夏季面臨極嚴重的全國輪流斷電危機。</p>
+                    </div>
+                </div>
+
+                <!-- 卡片 3: 蘇丹 -->
+                <div class="conflict-card bg-slate-900 border border-slate-800 rounded-xl p-5 flex flex-col justify-between hover:border-red-900/50 transition-all duration-300 shadow-md" data-status="active">
+                    <div>
+                        <div class="flex justify-between items-start mb-3">
+                            <span class="bg-red-950 text-red-400 border border-red-800/30 text-[10px] font-bold px-2 py-0.5 rounded uppercase font-mono">Active War</span>
+                            <span class="text-[11px] text-slate-500 font-mono">AFRICA</span>
+                        </div>
+                        <h3 class="text-base font-bold text-white mb-1">蘇丹內戰 (SAF vs RSF)</h3>
+                        <p class="text-[11px] font-mono text-slate-500 mb-3">Sudanese Civil War</p>
+                        <p class="text-xs text-slate-300 leading-relaxed"><strong>現況：</strong>國家完全分裂，快速支援部隊（RSF）與政府軍（SAF）在中部科爾多凡爆發拉鋸戰。因補給線遭阻斷，聯合國發布21世紀最嚴重的集體飢荒預警。</p>
+                    </div>
+                </div>
+
+                <!-- 卡片 4: 緬甸 -->
+                <div class="conflict-card bg-slate-900 border border-slate-800 rounded-xl p-5 flex flex-col justify-between hover:border-red-900/50 transition-all duration-300 shadow-md" data-status="active">
+                    <div>
+                        <div class="flex justify-between items-start mb-3">
+                            <span class="bg-red-950 text-red-400 border border-red-800/30 text-[10px] font-bold px-2 py-0.5 rounded uppercase font-mono">Active War</span>
+                            <span class="text-[11px] text-slate-500 font-mono">ASIA</span>
+                        </div>
+                        <h3 class="text-base font-bold text-white mb-1">緬甸內戰 (春天革命)</h3>
+                        <p class="text-[11px] font-mono text-slate-500 mb-3">Myanmar Civil War</p>
+                        <p class="text-xs text-slate-300 leading-relaxed"><strong>現況：</strong>民防軍（PDF）與地方民武聯盟控制了多數邊境口岸。軍政府控制區萎縮至中部的城市核心，並企圖於年底舉辦爭議大選作為政治緩兵之計。</p>
+                    </div>
+                </div>
+
+                <!-- 卡片 5: 印巴 -->
+                <div class="conflict-card bg-slate-900 border border-slate-800 rounded-xl p-5 flex flex-col justify-between hover:border-amber-900/50 transition-all duration-300 shadow-md" data-status="quasi">
+                    <div>
+                        <div class="flex justify-between items-start mb-3">
+                            <span class="bg-amber-950 text-amber-400 border border-amber-800/30 text-[10px] font-bold px-2 py-0.5 rounded uppercase font-mono">Quasi-War</span>
+                            <span class="text-[11px] text-slate-500 font-mono">SOUTH ASIA</span>
+                        </div>
+                        <h3 class="text-base font-bold text-white mb-1">印巴喀什米爾與水資源對峙</h3>
+                        <p class="text-[11px] font-mono text-slate-500 mb-3">India-Pakistan Standoff</p>
+                        <p class="text-xs text-slate-300 leading-relaxed"><strong>現況：</strong>軍事維持技術性停火，但外交全面斷聯。印度單方面暫停執行《印度河流域條約》，透過上游節流限制巴基斯坦水源，形成新型態的資源武器化博弈。</p>
+                    </div>
+                </div>
+
+                <!-- 卡片 6: 朝鮮半島 -->
+                <div class="conflict-card bg-slate-900 border border-slate-800 rounded-xl p-5 flex flex-col justify-between hover:border-amber-900/50 transition-all duration-300 shadow-md" data-status="quasi">
+                    <div>
+                        <div class="flex justify-between items-start mb-3">
+                            <span class="bg-amber-950 text-amber-400 border border-amber-800/30 text-[10px] font-bold px-2 py-0.5 rounded uppercase font-mono">Quasi-War</span>
+                            <span class="text-[11px] text-slate-500 font-mono">EAST ASIA</span>
+                        </div>
+                        <h3 class="text-base font-bold text-white mb-1">朝鮮半島核武與無人機對峙</h3>
+                        <p class="text-[11px] font-mono text-slate-500 mb-3">Korean Peninsula Tensions</p>
+                        <p class="text-xs text-slate-300 leading-relaxed"><strong>現況：</strong>北韓將南韓定義為頭號敵國並廢除互不侵犯協議。非軍事區（DMZ）周邊全面進入臨戰配置，頻繁發生跨界無人機滲透與ＧＰＳ訊號干擾摩擦。</p>
+                    </div>
+                </div>
+
+                <!-- 卡片 7: 台海 -->
+                <div class="conflict-card bg-slate-900 border border-slate-800 rounded-xl p-5 flex flex-col justify-between hover:border-amber-900/50 transition-all duration-300 shadow-md" data-status="quasi">
+                    <div>
+                        <div class="flex justify-between items-start mb-3">
+                            <span class="bg-amber-950 text-amber-400 border border-amber-800/30 text-[10px] font-bold px-2 py-0.5 rounded uppercase font-mono">Quasi-War</span>
+                            <span class="text-[11px] text-slate-500 font-mono">TAIWAN STRAIT</span>
+                        </div>
+                        <h3 class="text-base font-bold text-white mb-1">台灣海峽灰色地帶對峙</h3>
+                        <p class="text-[11px] font-mono text-slate-500 mb-3">Taiwan Strait Grey-Zone</p>
+                        <p class="text-xs text-slate-300 leading-relaxed"><strong>現況：</strong>中共解放軍軍機、軍艦常態化越過海峽中線進行聯合戰備警巡，並派遣海警船切入金馬限制水域，試圖透過常態化「灰色地帶戰術」蠶食海域管轄權。</p>
+                    </div>
+                </div>
+
+                <!-- 卡片 8: 南海 -->
+                <div class="conflict-card bg-slate-900 border border-slate-800 rounded-xl p-5 flex flex-col justify-between hover:border-amber-900/50 transition-all duration-300 shadow-md" data-status="quasi">
+                    <div>
+                        <div class="flex justify-between items-start mb-3">
+                            <span class="bg-amber-950 text-amber-400 border border-amber-800/30 text-[10px] font-bold px-2 py-0.5 rounded uppercase font-mono">Quasi-War</span>
+                            <span class="text-[11px] text-slate-500 font-mono">SOUTH CHINA SEA</span>
+                        </div>
+                        <h3 class="text-base font-bold text-white mb-1">南海美菲中海域主權對峙</h3>
+                        <p class="text-[11px] font-mono text-slate-500 mb-3">South China Sea Standoff</p>
+                        <p class="text-xs text-slate-300 leading-relaxed"><strong>現況：</strong>中方海警頻繁在仁愛暗沙及黃岩島使用高壓水砲與實體撞擊攔截菲律賓補給。美菲則高度聯動《美菲共同防禦條約》反制，是美中直接擦槍走火的高危險點。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右側：即時情報主控台 (Live Intelligence Feed) (佔 1 欄) -->
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 flex flex-col h-[600px] lg:h-auto">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-3">
+                <div class="flex items-center gap-2">
+                    <span class="h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <h2 class="text-xs font-bold font-mono tracking-wider uppercase text-slate-300">LIVE INTEL FEED</h2>
+                </div>
+                <span class="text-[10px] font-mono bg-slate-950 px-2 py-0.5 rounded text-slate-500">STREAMING</span>
+            </div>
+            
+            <!-- 動態訊息滾動容器 -->
+            <div id="intel-container" class="flex-1 overflow-y-auto space-y-3 pr-1 no-scrollbar text-xs font-mono">
+                <!-- 預先載入的初始化日誌 -->
+                <div class="p-2.5 bg-slate-950/60 rounded border border-slate-800/60 text-slate-400">
+                    <span class="text-slate-600">[06:12:01]</span> <span class="text-sky-400">[SYS_INIT]</span> 全球衛星遙測流連線成功，開始監聽地緣數據。
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 頁尾 -->
+    <footer class="border-t border-slate-900 bg-slate-950 py-3 text-center text-[11px] text-slate-600 font-mono">
+        &copy; 2026 GEOPOLITICAL RISK MONITOR. OPEN-SOURCE INTELLIGENCE.
+    </footer>
+
+    <!-- 系統控制邏輯 JS -->
+    <script>
+        // 1. 頂部時鐘更新
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('live-clock').innerText = 'UTC/LIVE: ' + now.toISOString().replace('T', ' ').substring(0, 19);
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // 2. 衝突圖卡篩選
+        function filterConflicts(category) {
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('btn-' + category).classList.add('active');
+
+            document.querySelectorAll('.conflict-card').forEach(card => {
+                if (category === 'all' || card.getAttribute('data-status') === category) {
+                    card.style.display = 'flex';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+            logSystemEvent('FILTER', `用戶切換檢視光譜至: [${category.toUpperCase()}]`);
+        }
+
+        // 3. 模擬即時情報流資料庫 (2026年7月地緣事件)
+        const mockIntelPool = [
+            { tag: "中東", text: "美軍第五艦隊向荷姆茲海峽增派神盾級驅逐艦，反制伊朗快艇挑釁。", type: "warn" },
+            { tag: "俄烏", text: "烏克蘭哈爾科夫（Kharkiv）電網遭不名無人機機群飽和襲擊，二次變電所起火。", type: "danger" },
+            { tag: "南海", text: "菲律賓海岸防衛隊指責中國海警船在仙賓礁（Sabina Shoal）周邊實施危險攔截。", type: "info" },
+            { tag: "台海", text: "台灣國防部偵獲解放軍殲-16及空警-500等各型機計14架次越過海峽中線。", type: "info" },
+            { tag: "蘇丹", text: "快速支援部隊（RSF）向北科爾多凡首府挺進，爆發激烈巷戰，難民向東撤離。", type: "danger" },
+            { tag: "緬甸", text: "克欽獨立軍（KIA）宣稱攻佔緬北最後一處重要稀土礦區出口口岸。", type: "info" },
+            { tag: "印巴", text: "伊斯蘭馬巴德指責印方單方面截流傑留姆河（Jhelum River）已構成違反國際法。", type: "warn" },
+            { tag: "朝鮮", text: "南韓軍方在江原道前線偵測到北韓軍方密集架設新型電子干擾天線陣列。", type: "warn" }
+        ];
+
+        const container = document.getElementById('intel-container');
+
+        function logSystemEvent(tag, text, type="info") {
+            const timeStr = new Date().toLocaleTimeString('zh-TW', { hour12: false });
+            let colorClass = "text-emerald-400";
+            if (type === "warn") colorClass = "text-amber-400";
+            if (type === "danger") colorClass = "text-red-400";
+            if (type === "FILTER") colorClass = "text-purple-400";
+
+            const logHtml = `
+                <div class="p-2.5 bg-slate-950/40 rounded border border-slate-900 flex flex-col gap-1 animate-fadeIn">
+                    <div class="flex items-center gap-2 text-[10px]">
+                        <span class="text-slate-600">[${timeStr}]</span>
+                        <span class="${colorClass} font-bold">[${tag}]</span>
+                    </div>
+                    <div class="text-slate-300 leading-relaxed">${text}</div>
+                </div>
+            `;
+            container.insertAdjacentHTML('afterbegin', logHtml);
+            
+            // 限制日誌數量避免網頁卡頓
+            if (container.children.length > 30) {
+                container.lastElementChild.remove();
+            }
+        }
+
+        // 定時隨機注入即時地緣日誌
+        setInterval(() => {
+            const randomIntel = mockIntelPool[Math.floor(Math.random() * mockIntelPool.length)];
+            logSystemEvent(randomIntel.tag, randomIntel.text, randomIntel.type);
+        }, 4500);
+    </script>
+</body>
+</html>
